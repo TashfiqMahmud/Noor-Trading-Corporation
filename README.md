@@ -21,12 +21,12 @@ An e-commerce application with a full-featured shopping cart, checkout system, a
 ## Tech Stack
 
 - **Backend**: Node.js with Express.js
-- **Database**: SQLite
+- **Database**: SQLite (local development) / Use PostgreSQL or MongoDB for production
 - **Authentication**: bcryptjs for password hashing
 - **Session Management**: express-session
 - **File Upload**: multer
 - **Frontend**: HTML5, CSS3, JavaScript
-- **Environment**: Node.js >=22.5.0
+- **Environment**: Node.js 20.x
 
 ## Project Structure
 
@@ -152,6 +152,30 @@ Check the seed file for default admin credentials.
 - `npm start` - Start the server
 - `npm run dev` - Start server (alternative)
 - `npm run seed` - Initialize database with seed data
+
+## Deployment
+
+### Local Deployment
+1. Install dependencies: `npm install`
+2. Seed database: `npm run seed`
+3. Start server: `npm start`
+4. Access at: `http://localhost:3000`
+
+### Vercel Deployment
+1. Push your code to GitHub
+2. Go to [vercel.com](https://vercel.com) and sign in with GitHub
+3. Import your `Noor-Trading-Corporation` repository
+4. Set environment variables in Vercel dashboard:
+   - `SESSION_SECRET` = your-secret-key
+5. Deploy
+
+**Note**: SQLite will work on Vercel but data is stored in `/tmp` and will reset on each deployment. For production, migrate to PostgreSQL or MongoDB.
+
+### Production Database Migration
+For production use, consider migrating from SQLite to:
+- **PostgreSQL** - Recommended for e-commerce
+- **MongoDB** - For flexible document storage
+- **MySQL** - Alternative relational database
 
 ## Security Notes
 
