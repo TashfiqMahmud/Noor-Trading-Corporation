@@ -1,0 +1,6 @@
+{
+  "version": 2,
+  "buildCommand": "echo 'Static files only'",
+  "outputDirectory": "public",
+  "cleanUrls": true
+}
