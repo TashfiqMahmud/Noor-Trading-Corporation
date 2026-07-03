@@ -1,0 +1,11 @@
+server.js
+routes/
+middleware/
+config/
+database/
+package.json
+package-lock.json
+.env
+.env.example
+.git
+node_modules
