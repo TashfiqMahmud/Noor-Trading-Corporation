@@ -1,8 +1,8 @@
 /**
  * API Configuration
- * Change API_BASE_URL for different environments
+ * Use a relative path for local development so requests target the running app.
  */
-const API_BASE_URL = 'https://noor-trading-corporation.onrender.com';
+const API_BASE_URL = '';
 
 // Helper function to construct API URLs
 function apiUrl(path) {

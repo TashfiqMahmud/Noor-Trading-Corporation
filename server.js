@@ -13,6 +13,7 @@ const adminOrdersRouter = require('./routes/admin-orders');
 
 // Ensure the database is created/migrated on boot.
 require('./config/database');
+require('./database/seed');
 
 const app = express();
 const PORT = process.env.PORT || 3000;

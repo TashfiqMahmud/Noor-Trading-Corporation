@@ -177,7 +177,7 @@ async function loadProducts(){
         '<td><div class="action-btns">'+
           '<button class="btn btn-sm btn-outline" onclick="editProd('+p.id+')">Edit</button>'+
           '<button class="btn btn-sm" style="background:#EEF3F9;border:1px solid #DDE6F0" onclick="toggleActive('+p.id+')">'+(p.isActive?'Deactivate':'Activate')+'</button>'+
-          '<button class="btn btn-sm btn-red" onclick="askDelete('+p.id+',''+esc(p.name).replace(/'/g,"\'")+'')" style="font-size:.78rem">Del</button>'+
+          '<button class="btn btn-sm btn-red" onclick="askDelete('+p.id+',\''+esc(p.name).replace(/'/g,"\\'")+'\')" style="font-size:.78rem">Del</button>'+
         '</div></td>'+
         '</tr>').join('')
     : '<tr><td colspan="8" style="text-align:center;padding:40px;color:#9DB0C8">No products found</td></tr>';
@@ -235,7 +235,16 @@ async function saveProd(){
   if(img)fd.append('image',img);
   const url=id?apiUrl('/api/admin/products/'+id):apiUrl('/api/admin/products');
   const r=await fetch(url,{method:id?'PUT':'POST',body:fd});
-  const d=await r.json();
+  let d;
+  try {
+    d = await r.json();
+  } catch (ex) {
+    err.textContent = 'Unable to parse server response.';
+    err.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Save Product';
+    return;
+  }
   btn.disabled=false;btn.textContent='Save Product';
   if(!r.ok){err.textContent=d.error||'Save failed';err.style.display='block';return;}
   closeModal();loadProducts();
