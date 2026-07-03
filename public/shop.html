@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"/>
   <link rel="stylesheet" href="/css/style.css"/>
+  <script src="/js/config.js"></script>
   <style>/* ============================================================
    Noor Trading Corporation — Hospital Equipment Marketplace
    Design: Clean medical white + navy blue + teal accent
@@ -1551,7 +1552,7 @@ async function loadProducts(){
   if(state.q)        p.set('q', state.q);
   if(state.avail==='featured') p.set('featured','1');
 
-  const res  = await fetch('/api/products?'+p);
+  const res  = await fetch(apiUrl('/api/products?'+p));
   const data = await res.json();
   let products = data.products;
   if(state.avail==='instock') products = products.filter(p=>p.inStock!==false);
@@ -1596,7 +1597,7 @@ function applySort(){state.sort=document.getElementById('sort-sel').value;state.
 function clearFilters(){location.href='/shop.html';}
 
 async function loadFilters(){
-  const res = await fetch('/api/categories');
+  const res = await fetch(apiUrl('/api/categories'));
   allCats = await res.json();
   const ul = document.getElementById('filter-cats');
   ul.innerHTML = '<li><a href="#" data-cat="" class="' + (!state.category?'active':'') + '">All Products</a></li>' +

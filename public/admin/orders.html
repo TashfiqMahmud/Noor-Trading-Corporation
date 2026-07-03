@@ -6,6 +6,7 @@
   <title>Orders - Noor Admin</title>
   <link rel="stylesheet" href="/css/style.css"/>
   <link rel="stylesheet" href="/css/admin.css"/>
+  <script src="/js/config.js"></script>
 </head>
 <body>
 <div class="admin-shell">
@@ -101,7 +102,7 @@ async function loadOrders(){
   const status=document.getElementById('f-status').value;
   const p=new URLSearchParams({page:curPage,limit:25});
   if(q)p.set('q',q);if(status)p.set('status',status);
-  const r=await fetch('/api/admin/orders?'+p);
+  const r=await fetch(apiUrl('/api/admin/orders?'+p));
   const d=await r.json();
   document.getElementById('ord-count').textContent=d.total+' orders';
 
@@ -138,7 +139,7 @@ async function viewOrder(id){
   body.innerHTML='<div class="spinner"></div>';
   foot.innerHTML='';
   modal.classList.add('open');
-  const r=await fetch('/api/admin/orders/'+id);
+  const r=await fetch(apiUrl('/api/admin/orders/'+id));
   const o=await r.json();
   document.getElementById('ord-modal-title').textContent='Order '+o.orderNumber;
   const items=o.items.map(it=>
@@ -173,8 +174,8 @@ async function viewOrder(id){
 }
 
 async function saveStatus(id){
-  const r=await fetch('/api/admin/orders/'+id+'/status',{method:'PUT',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({status:document.getElementById('edit-status').value,paymentStatus:document.getElementById('edit-pay').value})});
+  const r=await fetch(apiUrl('/api/admin/orders/'+id+'/status'),{method:'PUT',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({status:document.getElementById('edit-status').value,paymentStatus:document.getElementById('edit-pay').value});
   if(r.ok){closeOrdModal();loadOrders();}else alert('Failed to update.');
 }
 

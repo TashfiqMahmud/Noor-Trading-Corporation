@@ -6,6 +6,7 @@
   <title>Dashboard - Noor Admin</title>
   <link rel="stylesheet" href="/css/style.css"/>
   <link rel="stylesheet" href="/css/admin.css"/>
+  <script src="/js/config.js"></script>
 </head>
 <body>
 <div class="admin-shell">
@@ -58,7 +59,7 @@ setInterval(()=>{const el=document.getElementById('clock');if(el)el.textContent=
 document.getElementById('nav-dash').classList.add('active');
 
 async function load(){
-  const r=await fetch('/api/admin/dashboard');
+  const r=await fetch(apiUrl('/api/admin/dashboard'));
   const d=await r.json();
   const orderRows = d.recentOrders.length
     ? d.recentOrders.map(o=>

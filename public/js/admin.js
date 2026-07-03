@@ -4,7 +4,7 @@
  */
 async function checkAdminAuth() {
   try {
-    const res = await fetch('/api/admin/session');
+    const res = await fetch(apiUrl('/api/admin/session'));
     const data = await res.json();
     if (!data.loggedIn) {
       location.href = '/admin/index.html';
@@ -19,7 +19,7 @@ async function checkAdminAuth() {
 }
 
 async function adminLogout() {
-  await fetch('/api/admin/logout', { method: 'POST' });
+  await fetch(apiUrl('/api/admin/logout'), { method: 'POST' });
   sessionStorage.removeItem('adminUsername');
   location.href = '/admin/index.html';
 }

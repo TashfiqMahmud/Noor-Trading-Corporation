@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"/>
   <link rel="stylesheet" href="/css/style.css"/>
+  <script src="/js/config.js"></script>
   <style>/* ============================================================
    Noor Trading Corporation — Hospital Equipment Marketplace
    Design: Clean medical white + navy blue + teal accent
@@ -1484,7 +1485,7 @@ async function boot(){
   const num=new URLSearchParams(location.search).get('order');
   const area=document.getElementById('success-area');
   if(!num){area.innerHTML='<div class="empty-state"><h3>No order found</h3><a href="/" class="btn btn-outline">Go Home</a></div>';return;}
-  const res=await fetch('/api/orders/'+encodeURIComponent(num));
+  const res=await fetch(apiUrl('/api/orders/'+encodeURIComponent(num)));
   if(!res.ok){area.innerHTML='<div class="empty-state"><h3>Order not found</h3><a href="/" class="btn btn-outline">Go Home</a></div>';return;}
   const o=await res.json();
   document.title='Order '+o.orderNumber+' – Noor Trading Corporation';

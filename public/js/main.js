@@ -100,7 +100,7 @@
   // ── Category nav loader ───────────────────────────────────
   async function loadCatNav(){
     try {
-      const res = await fetch('/api/categories');
+      const res = await fetch(apiUrl('/api/categories'));
       const cats = await res.json();
       const nav = document.getElementById('cat-nav-list');
       if(!nav) return;

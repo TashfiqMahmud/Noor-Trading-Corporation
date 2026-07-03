@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"/>
   <link rel="stylesheet" href="/css/style.css"/>
+  <script src="/js/config.js"></script>
   <style>/* ============================================================
    Noor Trading Corporation — Hospital Equipment Marketplace
    Design: Clean medical white + navy blue + teal accent
@@ -1588,7 +1589,7 @@ async function placeOrder(){
   btn.disabled=true; btn.textContent='Placing order…';
 
   try{
-    const res=await fetch('/api/orders',{
+    const res=await fetch(apiUrl('/api/orders'),{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({customer:{name,phone,email:email||undefined,address:addr,city,notes},items})
@@ -1613,7 +1614,7 @@ async function boot(){
   const items=NTCCart.getCart();
   if(!items.length){renderCheckout([]);return;}
   const ids=items.map(i=>i.productId).join(',');
-  const res=await fetch('/api/products/batch?ids='+ids);
+  const res=await fetch(apiUrl('/api/products/batch?ids='+ids));
   renderCheckout((await res.json()).products);
 }
 document.addEventListener('DOMContentLoaded',boot);
