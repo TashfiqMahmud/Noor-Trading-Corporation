@@ -11,9 +11,5 @@
       "src": "/(.*)",
       "dest": "server.js"
     }
-  ],
-  "env": {
-    "SESSION_SECRET": "@session_secret",
-    "DB_PATH": "./database/noor.db"
-  }
+  ]
 }
