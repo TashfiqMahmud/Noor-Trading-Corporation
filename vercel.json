@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "public": "public",
+  "buildCommand": "echo 'Static site - no build needed'",
+  "outputDirectory": "public",
+  "trailingSlash": false,
+  "routes": [
+    {
+      "src": "/admin/(.*)",
+      "dest": "/admin/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
