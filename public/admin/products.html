@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Products - Noor Admin</title>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="stylesheet" href="/css/admin.css"/>
+</head>
+<body>
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="sidebar-head">
+      <img src="/images/noor-logo.jpg" alt="Noor" class="sidebar-logo-img"/>
+      <div class="sidebar-brand">Noor Trading<small>Admin Panel</small></div>
+    </div>
+    <nav style="flex:1">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Main</div>
+        <ul class="sidebar-nav">
+          <li><a href="/admin/dashboard.html" id="nav-dash">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard</a></li>
+          <li><a href="/admin/products.html" id="nav-prod">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Products</a></li>
+          <li><a href="/admin/orders.html" id="nav-ord">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Orders</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Site</div>
+        <ul class="sidebar-nav">
+          <li><a href="/" target="_blank">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            View Store</a></li>
+        </ul>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div><span class="user-name" id="admin-name">Admin</span></div>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);width:100%;padding:7px" onclick="adminLogout()">Sign Out</button>
+    </div>
+  </aside>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <h1>Products</h1>
+      <div id="topbar-right"><span id="prod-count" style="font-size:.82rem;color:#9DB0C8"></span><button class="btn btn-teal btn-sm" onclick="openModal(null)">+ Add Product</button></div>
+    </div>
+    <div class="admin-content" id="content"><div class="spinner"></div></div>
+  </div>
+</div>
+<script src="/js/cart.js"></script>
+<script src="/js/admin.js"></script>
+
+<div class="admin-card" style="margin-bottom:18px">
+  <div class="admin-card-head">
+    <div class="actions">
+      <input type="search" id="f-q" placeholder="Search name or SKU..." oninput="debouncedLoad()"/>
+      <select id="f-cat-filter" onchange="loadProducts()"><option value="">All Categories</option></select>
+      <select id="f-status" onchange="loadProducts()">
+        <option value="">All Products</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+        <option value="low-stock">Low Stock</option>
+        <option value="out-of-stock">Out of Stock</option>
+      </select>
+    </div>
+  </div>
+</div>
+<div class="admin-card">
+  <div style="overflow-x:auto">
+    <table class="admin-table">
+      <thead><tr><th>Image</th><th>Product Name</th><th>SKU</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="tbody"><tr><td colspan="8" style="text-align:center;padding:40px"><div class="spinner" style="margin:0 auto"></div></td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Product Modal -->
+<div class="modal-overlay" id="prod-modal">
+  <div class="modal">
+    <div class="modal-head"><h3 id="m-title">Add Product</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="m-id"/>
+      <div class="form-row-2">
+        <div class="form-group" style="grid-column:1/-1"><label>Product Name *</label><input type="text" id="m-name" placeholder="e.g. ICU Electric Bed 5 Function"/></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>SKU</label><input type="text" id="m-sku" placeholder="NTC-BED-001"/></div>
+        <div class="form-group"><label>Category</label><select id="m-cat"><option value="">-- No Category --</option></select></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>Price (BDT) *</label><input type="number" id="m-price" min="0" step="0.01" placeholder="0.00"/></div>
+        <div class="form-group"><label>Compare-at Price</label><input type="number" id="m-compare" min="0" step="0.01" placeholder="Original price"/></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>Stock Quantity *</label><input type="number" id="m-stock" min="0" value="0"/></div>
+        <div class="form-group"><label>Unit</label>
+          <select id="m-unit"><option>pcs</option><option>set</option><option>pair</option><option>unit</option><option>box</option><option>pack</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>Description</label><textarea id="m-desc" rows="3" placeholder="Product details, specifications..."></textarea></div>
+      <div class="form-group">
+        <label>Product Image</label>
+        <input type="file" id="m-image" accept="image/*" onchange="previewImg(this)"/>
+        <img id="m-preview" class="img-preview" src="/images/products/placeholder.svg"/>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:20px">
+          <input type="checkbox" id="m-featured" style="width:auto"/>
+          <label for="m-featured" style="margin:0">Featured Product</label>
+        </div>
+        <div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:20px">
+          <input type="checkbox" id="m-active" checked style="width:auto"/>
+          <label for="m-active" style="margin:0">Active (visible on site)</label>
+        </div>
+      </div>
+      <div id="m-err" style="color:#DC2626;font-size:.82rem;display:none;margin-top:8px;padding:10px;background:#FEE2E2;border-radius:8px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="btn-save" onclick="saveProd()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal-overlay" id="del-modal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-head"><h3>Delete Product?</h3><button class="modal-close" onclick="document.getElementById('del-modal').classList.remove('open')">&times;</button></div>
+    <div class="modal-body"><p>Are you sure you want to delete <strong id="del-name"></strong>? This cannot be undone.</p></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="document.getElementById('del-modal').classList.remove('open')">Cancel</button>
+      <button class="btn btn-red" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+<script>const money=n=>'\u09F3'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+document.getElementById('nav-prod').classList.add('active');
+let cats=[], delId=null, debT=null;
+
+function stockCls(q){return q===0?'stock-empty':q<=5?'stock-low':'stock-ok';}
+
+async function loadCats(){
+  const r=await fetch('/api/admin/categories');
+  cats=(await r.json()).categories;
+  const catSel=document.getElementById('f-cat-filter');
+  catSel.innerHTML='<option value="">All Categories</option>'+cats.map(c=>'<option value="'+c.id+'">'+esc(c.name)+'</option>').join('');
+  const modalCat=document.getElementById('m-cat');
+  modalCat.innerHTML='<option value="">-- No Category --</option>'+cats.map(c=>'<option value="'+c.id+'">'+esc(c.name)+'</option>').join('');
+}
+
+async function loadProducts(){
+  const q=document.getElementById('f-q').value.trim();
+  const cat=document.getElementById('f-cat-filter').value;
+  const status=document.getElementById('f-status').value;
+  const p=new URLSearchParams();
+  if(q)p.set('q',q);if(cat)p.set('category',cat);if(status)p.set('status',status);
+  const r=await fetch('/api/admin/products?'+p);
+  const d=await r.json();
+  document.getElementById('prod-count').textContent=d.products.length+' products';
+  document.getElementById('tbody').innerHTML=d.products.length
+    ? d.products.map(p=>
+        '<tr class="'+(p.stockQuantity===0?'row-lowstock':'')+'">'+
+        '<td><img class="thumb" src="'+esc(p.imageUrl||'/images/products/placeholder.svg')+'" alt=""/></td>'+
+        '<td class="name-cell">'+esc(p.name)+'</td>'+
+        '<td class="sku-cell">'+esc(p.sku||'')+'</td>'+
+        '<td>'+esc(p.categoryName||'—')+'</td>'+
+        '<td class="price-cell">'+money(p.price)+'</td>'+
+        '<td class="'+stockCls(p.stockQuantity)+'">'+p.stockQuantity+' '+esc(p.unit)+'</td>'+
+        '<td><span class="chip '+(p.isActive?'chip-active':'chip-inactive')+'">'+(p.isActive?'Active':'Inactive')+'</span>'+
+          (p.isFeatured?' <span class="chip chip-processing">Featured</span>':'')+
+        '</td>'+
+        '<td><div class="action-btns">'+
+          '<button class="btn btn-sm btn-outline" onclick="editProd('+p.id+')">Edit</button>'+
+          '<button class="btn btn-sm" style="background:#EEF3F9;border:1px solid #DDE6F0" onclick="toggleActive('+p.id+')">'+(p.isActive?'Deactivate':'Activate')+'</button>'+
+          '<button class="btn btn-sm btn-red" onclick="askDelete('+p.id+',''+esc(p.name).replace(/'/g,"\'")+'')" style="font-size:.78rem">Del</button>'+
+        '</div></td>'+
+        '</tr>').join('')
+    : '<tr><td colspan="8" style="text-align:center;padding:40px;color:#9DB0C8">No products found</td></tr>';
+}
+
+function debouncedLoad(){clearTimeout(debT);debT=setTimeout(loadProducts,350);}
+
+function openModal(p){
+  document.getElementById('m-id').value=p?p.id:'';
+  document.getElementById('m-title').textContent=p?'Edit Product':'Add Product';
+  document.getElementById('m-name').value=p?p.name:'';
+  document.getElementById('m-sku').value=p?(p.sku||''):'';
+  document.getElementById('m-price').value=p?p.price:'';
+  document.getElementById('m-compare').value=p?(p.compareAtPrice||''):'';
+  document.getElementById('m-stock').value=p?p.stockQuantity:0;
+  document.getElementById('m-unit').value=p?(p.unit||'pcs'):'pcs';
+  document.getElementById('m-desc').value=p?(p.description||''):'';
+  document.getElementById('m-featured').checked=p?p.isFeatured:false;
+  document.getElementById('m-active').checked=p?p.isActive:true;
+  document.getElementById('m-preview').src=p?(p.imageUrl||'/images/products/placeholder.svg'):'/images/products/placeholder.svg';
+  document.getElementById('m-cat').value=p&&p.categoryId?p.categoryId:'';
+  document.getElementById('m-image').value='';
+  document.getElementById('m-err').style.display='none';
+  document.getElementById('prod-modal').classList.add('open');
+}
+
+async function editProd(id){
+  const r=await fetch('/api/admin/products/'+id);
+  openModal(await r.json());
+}
+
+function closeModal(){document.getElementById('prod-modal').classList.remove('open');}
+
+function previewImg(inp){
+  if(inp.files&&inp.files[0]){const fr=new FileReader();fr.onload=e=>document.getElementById('m-preview').src=e.target.result;fr.readAsDataURL(inp.files[0]);}
+}
+
+async function saveProd(){
+  const btn=document.getElementById('btn-save');
+  btn.disabled=true;btn.textContent='Saving…';
+  const err=document.getElementById('m-err');err.style.display='none';
+  const id=document.getElementById('m-id').value;
+  const fd=new FormData();
+  fd.append('name',document.getElementById('m-name').value.trim());
+  fd.append('sku',document.getElementById('m-sku').value.trim());
+  fd.append('price',document.getElementById('m-price').value);
+  fd.append('compareAtPrice',document.getElementById('m-compare').value);
+  fd.append('stockQuantity',document.getElementById('m-stock').value);
+  fd.append('categoryId',document.getElementById('m-cat').value);
+  fd.append('unit',document.getElementById('m-unit').value);
+  fd.append('description',document.getElementById('m-desc').value.trim());
+  fd.append('isFeatured',document.getElementById('m-featured').checked);
+  fd.append('isActive',document.getElementById('m-active').checked);
+  const img=document.getElementById('m-image').files[0];
+  if(img)fd.append('image',img);
+  const url=id?'/api/admin/products/'+id:'/api/admin/products';
+  const r=await fetch(url,{method:id?'PUT':'POST',body:fd});
+  const d=await r.json();
+  btn.disabled=false;btn.textContent='Save Product';
+  if(!r.ok){err.textContent=d.error||'Save failed';err.style.display='block';return;}
+  closeModal();loadProducts();
+}
+
+async function toggleActive(id){await fetch('/api/admin/products/'+id+'/toggle',{method:'PATCH'});loadProducts();}
+
+function askDelete(id,name){delId=id;document.getElementById('del-name').textContent=name;document.getElementById('del-modal').classList.add('open');}
+
+async function confirmDelete(){
+  if(!delId)return;
+  await fetch('/api/admin/products/'+delId,{method:'DELETE'});
+  document.getElementById('del-modal').classList.remove('open');
+  delId=null;loadProducts();
+}
+
+const sp=new URLSearchParams(location.search);
+if(sp.get('status'))document.addEventListener('DOMContentLoaded',()=>{document.getElementById('f-status').value=sp.get('status');});
+
+document.addEventListener('DOMContentLoaded',async()=>{
+  if(!await checkAdminAuth())return;
+  document.getElementById('admin-name').textContent=sessionStorage.getItem('adminUsername')||'Admin';
+  await loadCats();
+  loadProducts();
+});
+</script></body></html>

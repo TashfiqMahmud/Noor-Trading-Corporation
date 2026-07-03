@@ -1,0 +1,35 @@
+<svg viewBox="0 0 600 480" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-IVS" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#EAF3FB"/>
+      <stop offset="100%" style="stop-color:#F7FBFF"/>
+    </linearGradient>
+    <pattern id="grid-IVS" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#C8DFF5" stroke-width="0.5" opacity="0.6"/>
+    </pattern>
+  </defs>
+  <rect width="600" height="480" fill="url(#bg-IVS)"/>
+  <rect width="600" height="480" fill="url(#grid-IVS)"/>
+  <!-- Corner cross accent -->
+  <rect x="22" y="22" width="18" height="6" rx="3" fill="#0E9E8A" opacity="0.6"/>
+  <rect x="27" y="17" width="6" height="18" rx="3" fill="#0E9E8A" opacity="0.6"/>
+  <!-- Icon group -->
+  <g transform="translate(300,210)" stroke-linecap="round" stroke-linejoin="round">
+    
+    <line x1="0" y1="-100" x2="0" y2="70" stroke="#1A5EAB" stroke-width="6"/>
+    <path d="M -50 -100 L 50 -100" stroke="#1A5EAB" stroke-width="4"/>
+    <circle cx="-40" cy="-105" r="6" fill="#0E9E8A" stroke="#1A5EAB" stroke-width="3"/>
+    <circle cx="40" cy="-105" r="6" fill="#0E9E8A" stroke="#1A5EAB" stroke-width="3"/>
+    <circle cx="-35" cy="70" r="12" fill="none" stroke="#1A5EAB" stroke-width="4"/>
+    <circle cx="35" cy="70" r="12" fill="none" stroke="#1A5EAB" stroke-width="4"/>
+    <circle cx="0" cy="75" r="12" fill="none" stroke="#1A5EAB" stroke-width="4"/>
+    
+  </g>
+  <!-- Label -->
+  <text x="300" y="400" text-anchor="middle" font-family="'Segoe UI',Arial,sans-serif" font-size="20" font-weight="700" fill="#1A5EAB" letter-spacing="1">IV STANDS & TROLLEYS</text>
+  <!-- Code badge -->
+  <rect x="480" y="20" width="70" height="28" rx="5" fill="#1A5EAB" opacity="0.12"/>
+  <text x="515" y="38" text-anchor="middle" font-family="'Courier New',monospace" font-size="13" font-weight="700" fill="#1A5EAB" letter-spacing="2">IVS</text>
+  <!-- Bottom bar -->
+  <rect x="0" y="460" width="600" height="20" fill="#1A5EAB" opacity="0.08"/>
+</svg>

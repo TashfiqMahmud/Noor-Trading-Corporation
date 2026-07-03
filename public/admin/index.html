@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login – Noor Trading Corporation</title>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <style>
+    body { background: #1A3A6B; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .login-box { background: #fff; border-radius: 16px; padding: 40px 36px; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(26,58,107,.3); }
+    .login-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+    .login-logo img { width: 54px; height: 54px; border-radius: 10px; object-fit: contain; background: #EAF3FB; padding: 4px; }
+    .login-logo div strong { display: block; font-family: 'Plus Jakarta Sans','Inter',sans-serif; font-size: 1.1rem; font-weight: 800; color: #1A3A6B; }
+    .login-logo div span { font-size: .72rem; color: #0E9E8A; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    h1 { font-size: 1.4rem; font-weight: 800; color: #1A3A6B; margin-bottom: 4px; font-family: 'Plus Jakarta Sans','Inter',sans-serif; }
+    p { color: #9DB0C8; font-size: .9rem; margin-bottom: 24px; }
+    .err { background: #FEE2E2; color: #DC2626; padding: 12px 14px; border-radius: 8px; font-size: .85rem; margin-bottom: 16px; display: none; }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <div class="login-logo">
+      <img src="/images/noor-logo.jpg" alt="Noor Trading"/>
+      <div><strong>Noor Trading</strong><span>Admin Panel</span></div>
+    </div>
+    <h1>Sign In</h1>
+    <p>Enter your credentials to access the admin panel.</p>
+    <div class="err" id="err"></div>
+    <div class="form-group"><label>Username</label><input type="text" id="username" placeholder="admin" autocomplete="username"/></div>
+    <div class="form-group"><label>Password</label><input type="password" id="password" placeholder="••••••••" autocomplete="current-password"/></div>
+    <button class="btn btn-navy btn-lg btn-block" id="btn" onclick="doLogin()">Sign In →</button>
+  </div>
+  <script>
+  async function doLogin(){
+    const u=document.getElementById('username').value.trim();
+    const p=document.getElementById('password').value;
+    const err=document.getElementById('err');
+    const btn=document.getElementById('btn');
+    err.style.display='none';
+    btn.disabled=true;btn.textContent='Signing in…';
+    const r=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const d=await r.json();
+    if(!r.ok){err.textContent=d.error||'Login failed';err.style.display='block';btn.disabled=false;btn.textContent='Sign In →';return;}
+    location.href='/admin/dashboard.html';
+  }
+  document.addEventListener('DOMContentLoaded',async()=>{
+    const r=await fetch('/api/admin/session');
+    const d=await r.json();
+    if(d.loggedIn)location.href='/admin/dashboard.html';
+  });
+  document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  </script>
+</body>
+</html>

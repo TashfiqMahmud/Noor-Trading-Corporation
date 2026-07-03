@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Orders - Noor Admin</title>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="stylesheet" href="/css/admin.css"/>
+</head>
+<body>
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="sidebar-head">
+      <img src="/images/noor-logo.jpg" alt="Noor" class="sidebar-logo-img"/>
+      <div class="sidebar-brand">Noor Trading<small>Admin Panel</small></div>
+    </div>
+    <nav style="flex:1">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Main</div>
+        <ul class="sidebar-nav">
+          <li><a href="/admin/dashboard.html" id="nav-dash">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard</a></li>
+          <li><a href="/admin/products.html" id="nav-prod">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Products</a></li>
+          <li><a href="/admin/orders.html" id="nav-ord">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Orders</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Site</div>
+        <ul class="sidebar-nav">
+          <li><a href="/" target="_blank">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            View Store</a></li>
+        </ul>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div><span class="user-name" id="admin-name">Admin</span></div>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);width:100%;padding:7px" onclick="adminLogout()">Sign Out</button>
+    </div>
+  </aside>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <h1>Orders</h1>
+      <div id="topbar-right"><span id="ord-count" style="font-size:.82rem;color:#9DB0C8"></span></div>
+    </div>
+    <div class="admin-content" id="content"><div class="spinner"></div></div>
+  </div>
+</div>
+<script src="/js/cart.js"></script>
+<script src="/js/admin.js"></script>
+
+<div class="admin-card" style="margin-bottom:18px">
+  <div class="admin-card-head">
+    <div class="actions">
+      <input type="search" id="f-q" placeholder="Search order #, name, phone..." oninput="debouncedLoad()" style="min-width:220px"/>
+      <select id="f-status" onchange="loadOrders()">
+        <option value="">All Statuses</option>
+        <option value="pending">Pending</option>
+        <option value="processing">Processing</option>
+        <option value="shipped">Shipped</option>
+        <option value="delivered">Delivered</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
+  </div>
+</div>
+<div class="admin-card">
+  <div style="overflow-x:auto">
+    <table class="admin-table">
+      <thead><tr><th>Order #</th><th>Customer</th><th>Phone</th><th>City</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+      <tbody id="tbody"><tr><td colspan="9" style="text-align:center;padding:40px"><div class="spinner" style="margin:0 auto"></div></td></tr></tbody>
+    </table>
+  </div>
+  <div class="pagination" id="pagination" style="padding:12px 16px;justify-content:flex-start"></div>
+</div>
+
+<!-- Order Modal -->
+<div class="modal-overlay" id="ord-modal">
+  <div class="modal" style="max-width:700px">
+    <div class="modal-head"><h3 id="ord-modal-title">Order Details</h3><button class="modal-close" onclick="closeOrdModal()">&times;</button></div>
+    <div class="modal-body" id="ord-body"><div class="spinner"></div></div>
+    <div class="modal-footer" id="ord-foot"></div>
+  </div>
+</div>
+<script>const money=n=>'\u09F3'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+document.getElementById('nav-ord').classList.add('active');
+let debT=null, curPage=1;
+const STATUS_OPTS=['pending','processing','shipped','delivered','cancelled'];
+const PAY_OPTS=['pending','paid','failed','refunded'];
+
+function fmtDate(d){return d?new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'—';}
+function debouncedLoad(){clearTimeout(debT);debT=setTimeout(loadOrders,350);}
+
+async function loadOrders(){
+  const q=document.getElementById('f-q').value.trim();
+  const status=document.getElementById('f-status').value;
+  const p=new URLSearchParams({page:curPage,limit:25});
+  if(q)p.set('q',q);if(status)p.set('status',status);
+  const r=await fetch('/api/admin/orders?'+p);
+  const d=await r.json();
+  document.getElementById('ord-count').textContent=d.total+' orders';
+
+  document.getElementById('tbody').innerHTML=d.orders.length
+    ? d.orders.map(o=>
+        '<tr>'+
+        '<td><a href="#" onclick="viewOrder('+o.id+');return false" style="color:#0E9E8A;font-weight:700;font-family:monospace;font-size:.8rem">'+esc(o.orderNumber)+'</a></td>'+
+        '<td class="name-cell">'+esc(o.customerName)+'</td>'+
+        '<td><a href="tel:'+esc(o.customerPhone)+'">'+esc(o.customerPhone)+'</a></td>'+
+        '<td>'+esc(o.city||'—')+'</td>'+
+        '<td class="price-cell">'+money(o.total)+'</td>'+
+        '<td><span class="chip '+(o.paymentStatus==='paid'?'chip-delivered':'chip-pending')+'">'+esc(o.paymentStatus)+'</span></td>'+
+        '<td><span class="chip chip-'+o.status+'">'+o.status+'</span></td>'+
+        '<td style="font-size:.8rem;white-space:nowrap">'+fmtDate(o.createdAt)+'</td>'+
+        '<td><button class="btn btn-sm btn-outline" onclick="viewOrder('+o.id+')">View</button></td>'+
+        '</tr>').join('')
+    : '<tr><td colspan="9" style="text-align:center;padding:40px;color:#9DB0C8">No orders found</td></tr>';
+
+  const pages=d.totalPages;
+  const pg=document.getElementById('pagination');
+  if(pages<=1){pg.innerHTML='';return;}
+  let h='<button '+(curPage<=1?'disabled':'')+' onclick="goPage('+(curPage-1)+')">&#8592;</button>';
+  for(let i=1;i<=pages;i++)h+='<button class="'+(i===curPage?'active':'')+'" onclick="goPage('+i+')">'+i+'</button>';
+  h+='<button '+(curPage>=pages?'disabled':'')+' onclick="goPage('+(curPage+1)+')">&#8594;</button>';
+  pg.innerHTML=h;
+}
+
+function goPage(p){curPage=p;loadOrders();}
+
+async function viewOrder(id){
+  const modal=document.getElementById('ord-modal');
+  const body=document.getElementById('ord-body');
+  const foot=document.getElementById('ord-foot');
+  body.innerHTML='<div class="spinner"></div>';
+  foot.innerHTML='';
+  modal.classList.add('open');
+  const r=await fetch('/api/admin/orders/'+id);
+  const o=await r.json();
+  document.getElementById('ord-modal-title').textContent='Order '+o.orderNumber;
+  const items=o.items.map(it=>
+    '<tr><td>'+esc(it.name)+'</td><td style="font-family:monospace;font-size:.8rem">'+esc(it.sku||'')+'</td>'+
+    '<td style="text-align:center">'+it.quantity+'</td>'+
+    '<td class="price-cell">'+money(it.price)+'</td>'+
+    '<td class="price-cell">'+money(it.lineTotal)+'</td></tr>').join('');
+  body.innerHTML=
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">'+
+    '<div><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9DB0C8;margin-bottom:6px">Customer</div>'+
+    '<strong>'+esc(o.customerName)+'</strong><br>'+
+    '<a href="tel:'+esc(o.customerPhone)+'">'+esc(o.customerPhone)+'</a>'+
+    (o.customerEmail?'<br><a href="mailto:'+esc(o.customerEmail)+'">'+esc(o.customerEmail)+'</a>':'')+'</div>'+
+    '<div><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9DB0C8;margin-bottom:6px">Delivery Address</div>'+
+    '<strong>'+esc(o.shippingAddress)+(o.city?', '+esc(o.city):'')+'</strong>'+
+    (o.notes?'<br><em style="color:#9DB0C8;font-size:.85rem">'+esc(o.notes)+'</em>':'')+'</div></div>'+
+    '<table class="admin-table" style="margin-bottom:14px"><thead><tr><th>Product</th><th>SKU</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead><tbody>'+items+'</tbody></table>'+
+    '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;margin-bottom:16px">'+
+    '<div style="display:flex;gap:24px;font-size:.88rem;color:#6B82A0"><span>Subtotal</span><span>'+money(o.subtotal)+'</span></div>'+
+    '<div style="display:flex;gap:24px;font-size:.88rem;color:#6B82A0"><span>Shipping</span><span>'+(o.shippingFee===0?'Free':money(o.shippingFee))+'</span></div>'+
+    '<div style="display:flex;gap:24px;font-size:1.05rem;font-weight:800;border-top:2px solid #DDE6F0;padding-top:8px;margin-top:4px"><span>Total</span><span style="color:#1A3A6B">'+money(o.total)+'</span></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'+
+    '<div class="form-group"><label>Order Status</label><select id="edit-status">'+
+    STATUS_OPTS.map(s=>'<option value="'+s+'"'+(o.status===s?' selected':'')+'>'+s.charAt(0).toUpperCase()+s.slice(1)+'</option>').join('')+
+    '</select></div>'+
+    '<div class="form-group"><label>Payment Status</label><select id="edit-pay">'+
+    PAY_OPTS.map(s=>'<option value="'+s+'"'+(o.paymentStatus===s?' selected':'')+'>'+s.charAt(0).toUpperCase()+s.slice(1)+'</option>').join('')+
+    '</select></div></div>';
+  foot.innerHTML=
+    '<button class="btn btn-outline" onclick="closeOrdModal()">Close</button>'+
+    '<button class="btn btn-primary" onclick="saveStatus('+id+')">Update Status</button>';
+}
+
+async function saveStatus(id){
+  const r=await fetch('/api/admin/orders/'+id+'/status',{method:'PUT',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({status:document.getElementById('edit-status').value,paymentStatus:document.getElementById('edit-pay').value})});
+  if(r.ok){closeOrdModal();loadOrders();}else alert('Failed to update.');
+}
+
+function closeOrdModal(){document.getElementById('ord-modal').classList.remove('open');}
+
+const sp=new URLSearchParams(location.search);
+document.addEventListener('DOMContentLoaded',async()=>{
+  if(!await checkAdminAuth())return;
+  document.getElementById('admin-name').textContent=sessionStorage.getItem('adminUsername')||'Admin';
+  loadOrders();
+  if(sp.get('id'))setTimeout(()=>viewOrder(sp.get('id')),600);
+});
+</script></body></html>

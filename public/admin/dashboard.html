@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Noor Admin</title>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="stylesheet" href="/css/admin.css"/>
+</head>
+<body>
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="sidebar-head">
+      <img src="/images/noor-logo.jpg" alt="Noor" class="sidebar-logo-img"/>
+      <div class="sidebar-brand">Noor Trading<small>Admin Panel</small></div>
+    </div>
+    <nav style="flex:1">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Main</div>
+        <ul class="sidebar-nav">
+          <li><a href="/admin/dashboard.html" id="nav-dash">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard</a></li>
+          <li><a href="/admin/products.html" id="nav-prod">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Products</a></li>
+          <li><a href="/admin/orders.html" id="nav-ord">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Orders</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Site</div>
+        <ul class="sidebar-nav">
+          <li><a href="/" target="_blank">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            View Store</a></li>
+        </ul>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div><span class="user-name" id="admin-name">Admin</span></div>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);width:100%;padding:7px" onclick="adminLogout()">Sign Out</button>
+    </div>
+  </aside>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <h1>Dashboard</h1>
+      <div id="topbar-right"><span id="clock" style="font-size:.82rem;color:#9DB0C8"></span><a href="/" target="_blank" class="btn btn-sm btn-outline" style="font-size:.78rem">View Store</a></div>
+    </div>
+    <div class="admin-content" id="content"><div class="spinner"></div></div>
+  </div>
+</div>
+<script src="/js/cart.js"></script>
+<script src="/js/admin.js"></script>
+<script>const money=n=>'\u09F3'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+setInterval(()=>{const el=document.getElementById('clock');if(el)el.textContent=new Date().toLocaleString('en-US');},1000);
+document.getElementById('nav-dash').classList.add('active');
+
+async function load(){
+  const r=await fetch('/api/admin/dashboard');
+  const d=await r.json();
+  const orderRows = d.recentOrders.length
+    ? d.recentOrders.map(o=>
+        '<tr><td><a href="/admin/orders.html?id='+o.id+'" style="color:#0E9E8A;font-weight:700;font-family:monospace;font-size:.8rem">'+esc(o.orderNumber)+'</a></td>'+
+        '<td class="name-cell">'+esc(o.customerName)+'</td><td>'+esc(o.customerPhone)+'</td>'+
+        '<td class="price-cell">'+money(o.total)+'</td>'+
+        '<td><span class="chip chip-'+o.status+'">'+o.status+'</span></td></tr>').join('')
+    : '<tr><td colspan="5" style="text-align:center;padding:28px;color:#9DB0C8">No orders yet</td></tr>';
+  const stockRows = d.lowStockList.length
+    ? d.lowStockList.map(p=>
+        '<tr class="row-lowstock"><td class="name-cell">'+esc(p.name)+'</td>'+
+        '<td class="sku-cell">'+esc(p.sku||'')+'</td>'+
+        '<td><span class="'+(p.stockQuantity===0?'stock-empty':'stock-low')+'">'+p.stockQuantity+' left</span></td></tr>').join('')
+    : '<tr><td colspan="3" style="text-align:center;padding:28px;color:#9DB0C8">All products well stocked</td></tr>';
+
+  document.getElementById('content').innerHTML =
+    '<div class="stat-grid">'+
+    '<div class="stat-card blue"><div class="stat-label">Total Orders</div><div class="stat-value">'+d.totalOrders+'</div><div class="stat-sub">'+d.pendingOrders+' pending</div></div>'+
+    '<div class="stat-card teal"><div class="stat-label">Today Orders</div><div class="stat-value">'+d.todayOrders+'</div><div class="stat-sub">'+money(d.todayRevenue)+' today</div></div>'+
+    '<div class="stat-card navy"><div class="stat-label">Total Revenue</div><div class="stat-value">'+money(d.totalRevenue)+'</div><div class="stat-sub">All confirmed</div></div>'+
+    '<div class="stat-card red"><div class="stat-label">Stock Alerts</div><div class="stat-value">'+d.outOfStockProducts+'</div><div class="stat-sub">'+d.lowStockProducts+' low stock</div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">'+
+    '<div class="admin-card">'+
+    '<div class="admin-card-head"><h2>Recent Orders</h2><a href="/admin/orders.html" class="btn btn-sm btn-outline" style="font-size:.78rem">View All</a></div>'+
+    '<table class="admin-table"><thead><tr><th>Order #</th><th>Customer</th><th>Phone</th><th>Total</th><th>Status</th></tr></thead><tbody>'+orderRows+'</tbody></table></div>'+
+    '<div class="admin-card">'+
+    '<div class="admin-card-head" style="background:#FFFBF0"><h2 style="color:#D97706">&#9888; Low / Out of Stock</h2><a href="/admin/products.html" class="btn btn-sm btn-outline" style="font-size:.78rem">Manage</a></div>'+
+    '<table class="admin-table"><thead><tr><th>Product</th><th>SKU</th><th>Qty</th></tr></thead><tbody>'+stockRows+'</tbody></table></div>'+
+    '</div>';
+}
+document.addEventListener('DOMContentLoaded',async()=>{
+  if(!await checkAdminAuth())return;
+  document.getElementById('admin-name').textContent=sessionStorage.getItem('adminUsername')||'Admin';
+  load(); setInterval(load,30000);
+});
+</script></body></html>
